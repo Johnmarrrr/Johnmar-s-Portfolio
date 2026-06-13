@@ -8,8 +8,7 @@
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev -w backend\" \"npm run dev -w frontend\"",
-    "build": "npm run build -w frontend",
-    "seed": "npm run seed -w backend"
+    "build": "npm run build -w frontend"
   },
   "devDependencies": {
     "concurrently": "^8.2.2"

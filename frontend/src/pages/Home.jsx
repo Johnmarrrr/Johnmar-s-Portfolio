@@ -14,7 +14,7 @@ const MOCK_PROJECTS = [
     title: 'Kabisado Educational Game',
     description: 'An interactive HTML5 educational platformer designed to make learning engaging and digital workflows accessible to students and developers.',
     category: 'Fullstack',
-    imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
+    imageUrl: '/projects/kabisado.jpg',
     tags: ['GDevelop', 'Pixi.js', 'HTML5', 'JavaScript'],
     githubUrl: 'https://github.com',
     liveUrl: 'https://kabisado.top/',
