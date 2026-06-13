@@ -246,7 +246,7 @@ export default function AdminDashboard() {
           <div>
             <h3 style={{ fontSize: '1.5rem', fontWeight: 800, marginBottom: '2rem' }}>Manage Skills</h3>
 
-            <div style={{ display: 'grid', gridTemplateColumns: '1.2fr 1.8fr', gap: '4rem', alignItems: 'start' }}>
+            <div className="admin-skills-grid">
               {/* Add Skill Form */}
               <form onSubmit={handleAddSkill} className="glow-card" style={{ padding: '2rem' }}>
                 <h4 style={{ fontWeight: 700, marginBottom: '1.5rem' }}>Add New Skill</h4>
@@ -272,7 +272,7 @@ export default function AdminDashboard() {
                     className="form-input"
                     value={newSkillCategory}
                     onChange={(e) => setNewSkillCategory(e.target.value)}
-                    style={{ background: '#0a0d1a', border: '1px solid var(--card-border)' }}
+                    style={{ background: 'var(--bg-color)', border: '1px solid var(--card-border)' }}
                   >
                     <option value="Frontend">Frontend</option>
                     <option value="Backend">Backend</option>

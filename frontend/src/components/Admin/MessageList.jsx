@@ -100,7 +100,7 @@ export default function MessageList({ token }) {
                   </td>
                   <td>{msg.subject || '(No Subject)'}</td>
                   <td>
-                    <div style={{ maxH: '80px', overflowY: 'auto', whiteSpace: 'pre-wrap', maxW: '300px', fontSize: '0.9rem' }}>
+                    <div style={{ maxHeight: '80px', overflowY: 'auto', whiteSpace: 'pre-wrap', maxWidth: '300px', fontSize: '0.9rem' }}>
                       {msg.message}
                     </div>
                   </td>

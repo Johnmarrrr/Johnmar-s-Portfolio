@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const projectRoutes = require('./routes/projectRoutes');
@@ -10,6 +12,76 @@ const messageRoutes = require('./routes/messageRoutes');
 // Load env vars
 dotenv.config();
 
+const app = express();
+
+// 1. Enable CORS first so all responses (including errors, rate limits & preflights) have CORS headers
+app.use(cors({
+  origin: '*', // Allow all origins for the portfolio API
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// Custom NoSQL Injection Sanitize Middleware (Express 5 compatible)
+const mongoSanitize = (req, res, next) => {
+  const sanitize = (obj) => {
+    if (obj && typeof obj === 'object') {
+      for (const key in obj) {
+        if (key.startsWith('$') || key.includes('.')) {
+          delete obj[key];
+        } else if (typeof obj[key] === 'object') {
+          sanitize(obj[key]);
+        }
+      }
+    }
+  };
+  sanitize(req.body);
+  sanitize(req.params);
+  if (req.query) {
+    sanitize(req.query);
+  }
+  next();
+};
+
+// 2. Security Middlewares
+app.use(helmet({
+  crossOriginResourcePolicy: { policy: "cross-origin" } // Allow cross-origin requests (e.g. from frontend dev server)
+})); 
+app.use(mongoSanitize); // Prevent NoSQL query injection
+
+// Limit request body size for security
+app.use(express.json({ limit: '10kb' }));
+
+// Rate Limiting (Skipping OPTIONS preflight requests to avoid CORS block)
+const apiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  message: { message: 'Too many requests from this IP, please try again after 15 minutes.' }
+});
+
+const loginLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 15, // Limit login/register attempts to 15 per window
+  standardHeaders: true,
+  legacyHeaders: false,
+  skip: (req) => req.method === 'OPTIONS',
+  message: { message: 'Too many authentication attempts from this IP, please try again after 15 minutes.' }
+});
+
+// Apply Rate Limiters
+app.use('/api/', apiLimiter);
+app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth/register', loginLimiter);
+
+// Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/skills', skillRoutes);
+app.use('/api/messages', messageRoutes);
+
 // Connect to Database and start server
 connectDB().then(() => {
   const PORT = process.env.PORT || 5000;
@@ -17,18 +89,6 @@ connectDB().then(() => {
     console.log(`Server running in ${process.env.NODE_ENV || 'development'} mode on port ${PORT}`);
   });
 });
-
-const app = express();
-
-// Middleware
-app.use(cors());
-app.use(express.json());
-
-// Routes
-app.use('/api/auth', authRoutes);
-app.use('/api/projects', projectRoutes);
-app.use('/api/skills', skillRoutes);
-app.use('/api/messages', messageRoutes);
 
 // Root Endpoint
 app.get('/', (req, res) => {

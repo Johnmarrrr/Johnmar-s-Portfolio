@@ -104,6 +104,42 @@ export default function Home() {
   const [statusMsg, setStatusMsg] = useState({ type: '', text: '' });
   const [isSubmitting, setIsSubmitting] = useState(false);
 
+  const [typedName, setTypedName] = useState('');
+  const fullName = 'Johnmar Cordeño';
+
+  useEffect(() => {
+    let index = 0;
+    let isDeleting = false;
+    let timer;
+
+    const tick = () => {
+      if (!isDeleting) {
+        setTypedName(fullName.substring(0, index + 1));
+        index++;
+
+        if (index === fullName.length) {
+          isDeleting = true;
+          timer = setTimeout(tick, 2200); // Wait 2.2s before deleting
+        } else {
+          timer = setTimeout(tick, 120); // Typing speed
+        }
+      } else {
+        setTypedName(fullName.substring(0, index - 1));
+        index--;
+
+        if (index === 0) {
+          isDeleting = false;
+          timer = setTimeout(tick, 500); // Wait 0.5s at empty text
+        } else {
+          timer = setTimeout(tick, 60); // Deleting speed (faster)
+        }
+      }
+    };
+
+    tick();
+    return () => clearTimeout(timer);
+  }, []);
+
   const location = useLocation();
 
   useEffect(() => {
@@ -196,27 +232,27 @@ export default function Home() {
         <div className="container">
           <div className="hero-grid">
             <div className="hero-content">
-              <span className="hero-tag">WELCOME TO MY UNIVERSE</span>
-              <span className="hero-tag" style={{ marginLeft: '0.5rem', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10b981' }}>AVAILABLE FOR HIRE</span>
-              <p style={{ fontSize: '1.25rem', color: 'var(--primary-color)', fontWeight: '600', marginBottom: '0.5rem' }}>Hello</p>
-              <h1 className="hero-title" style={{ marginBottom: '1rem' }}>
-                I'm <span className="gradient-text">Johnmar Cordeño</span>
+              {/* <span className="hero-tag">WELCOME TO MY UNIVERSE</span> */}
+              {/* <span className="hero-tag" style={{ marginLeft: '0.5rem', background: 'rgba(16, 185, 129, 0.08)', border: '1px solid rgba(16, 185, 129, 0.2)', color: '#10b981' }}>AVAILABLE FOR HIRE</span> */}
+              <p className="animate-fade-in" style={{ fontSize: '1.25rem', color: 'var(--primary-color)', fontWeight: '600', marginBottom: '0.5rem' }}>Hello</p>
+              <h1 className="hero-title animate-fade-in delay-1" style={{ marginBottom: '1rem' }}>
+                I'm <span className="gradient-text">{typedName}<span className="typewriter-cursor">|</span></span>
               </h1>
-              <h2 style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '1rem', color: '#e2e8f0' }}>
-                JavaScript Developer & Creator of Kabisado
+              <h2 className="animate-fade-in delay-2" style={{ fontSize: '1.8rem', fontWeight: '700', marginBottom: '1rem', color: 'var(--text-primary)' }}>
+                JavaScript, Php Developer & Creator of Kabisado
               </h2>
-              <p style={{ fontSize: '1.05rem', color: '#a7f3d0', fontWeight: '500', marginBottom: '1.5rem', fontStyle: 'italic' }}>
-                JavaScript lover 🚀 | Kabisado creator 🔧 | Python Enjoyer and coding the future 💻✨
+              <p className="animate-fade-in delay-2" style={{ fontSize: '1.05rem', color: 'var(--primary-color)', fontWeight: '600', marginBottom: '1.5rem', fontStyle: 'italic' }}>
+                JavaScript | Php | Kabisado | Python  | Java | Flutter
               </p>
-              <p className="hero-desc" style={{ fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
+              <p className="hero-desc animate-fade-in delay-3" style={{ fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '1.5rem' }}>
                 Hello! I'm Johnmar Cordeño, a passionate JavaScript developer specializing in creating innovative web solutions and user-friendly interfaces. As the creator of the Kabisado Educational Game, I'm dedicated to simplifying development workflows.
               </p>
-              <p className="hero-desc" style={{ fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '2rem' }}>
+              <p className="hero-desc animate-fade-in delay-3" style={{ fontSize: '1.05rem', lineHeight: '1.6', marginBottom: '2rem' }}>
                 My focus is on making web development faster, easier, and accessible to all developers. Currently, I'm expanding into backend development to grow as a full-stack developer and create seamless, robust web applications.
               </p>
-              <div className="hero-buttons">
+              <div className="hero-buttons animate-fade-in delay-4">
                 <a href="#projects" className="btn-primary">
-                  Learn More <ArrowRight size={18} />
+                  Learn More
                 </a>
                 <a href="#contact" className="btn-secondary">
                   Get Resume
@@ -224,7 +260,7 @@ export default function Home() {
               </div>
             </div>
 
-            <div className="hero-visual">
+            <div className="hero-visual animate-fade-in delay-2">
               <div className="hero-image-container">
                 <img src="/hero/hero.png" alt="Johnmar Cordeño" onError={(e) => {
                   e.target.src = 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=400';
@@ -265,7 +301,7 @@ export default function Home() {
                   <div className="code-result">
                     <span className="code-result-label">// Interactive Check</span>
                     <span className="code-result-val">
-                      profile.hireable() =&gt; true ✅
+                      profile.hireable() =&gt; true 
                     </span>
                   </div>
                 </div>
