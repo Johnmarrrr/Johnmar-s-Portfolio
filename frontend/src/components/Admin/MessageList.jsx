@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Trash2, Check } from 'lucide-react';
+import { API_URL } from '../../config';
+
 
 export default function MessageList({ token }) {
   const [messages, setMessages] = useState([]);
@@ -8,10 +10,8 @@ export default function MessageList({ token }) {
 
   const fetchMessages = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/messages', {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+      const res = await fetch(`${API_URL}/api/messages`, {
+        credentials: 'include'
       });
       const data = await res.json();
       if (res.ok) {
@@ -32,12 +32,12 @@ export default function MessageList({ token }) {
 
   const toggleReadStatus = async (id, currentStatus) => {
     try {
-      const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+      const res = await fetch(`${API_URL}/api/messages/${id}`, {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({ read: !currentStatus }),
       });
       if (res.ok) {
@@ -51,11 +51,9 @@ export default function MessageList({ token }) {
   const deleteMessage = async (id) => {
     if (!window.confirm('Are you sure you want to delete this message?')) return;
     try {
-      const res = await fetch(`http://localhost:5000/api/messages/${id}`, {
+      const res = await fetch(`${API_URL}/api/messages/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include'
       });
       if (res.ok) {
         setMessages(messages.filter((msg) => msg._id !== id));

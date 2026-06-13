@@ -1,4 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
+import { API_URL } from '../config';
+
 
 export const AuthContext = createContext();
 
@@ -15,10 +17,8 @@ export const AuthProvider = ({ children }) => {
         return;
       }
       try {
-        const res = await fetch('http://localhost:5000/api/auth/me', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const res = await fetch(`${API_URL}/api/auth/me`, {
+          credentials: 'include',
         });
         if (res.ok) {
           const data = await res.json();
@@ -39,18 +39,19 @@ export const AuthProvider = ({ children }) => {
   }, [token]);
 
   const login = async (username, password) => {
-    const res = await fetch('http://localhost:5000/api/auth/login', {
+    const res = await fetch(`${API_URL}/api/auth/login`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ username, password }),
+      credentials: 'include',
     });
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
+      localStorage.setItem('token', 'true'); // Non-sensitive flag
+      setToken('true');
       setUser({ username: data.username, _id: data._id });
       return { success: true };
     } else {
@@ -59,18 +60,19 @@ export const AuthProvider = ({ children }) => {
   };
 
   const register = async (username, password) => {
-    const res = await fetch('http://localhost:5000/api/auth/register', {
+    const res = await fetch(`${API_URL}/api/auth/register`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ username, password }),
+      credentials: 'include',
     });
 
     const data = await res.json();
     if (res.ok) {
-      localStorage.setItem('token', data.token);
-      setToken(data.token);
+      localStorage.setItem('token', 'true'); // Non-sensitive flag
+      setToken('true');
       setUser({ username: data.username, _id: data._id });
       return { success: true };
     } else {
@@ -78,7 +80,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const logout = () => {
+  const logout = async () => {
+    try {
+      await fetch(`${API_URL}/api/auth/logout`, {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (err) {
+      console.error(err);
+    }
     localStorage.removeItem('token');
     setToken(null);
     setUser(null);

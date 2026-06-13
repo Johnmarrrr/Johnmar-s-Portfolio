@@ -1116,3 +1116,58 @@ footer {
 [data-theme="light"] .theme-toggle:hover {
   background: rgba(15, 23, 42, 0.05);
 }
+
+/* Skills layout side by side with 3D Globe */
+.skills-grid-layout {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 3rem;
+  align-items: center;
+  width: 100%;
+  margin-top: 2rem;
+}
+
+.skills-globe-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.skills-globe-wrapper {
+  padding: 2rem;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 16px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  max-width: 440px;
+  position: relative;
+  overflow: hidden;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.15);
+}
+
+.skills-matrix-column {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+
+@media (min-width: 768px) {
+  .skills-matrix-column {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .skills-grid-layout {
+    grid-template-columns: 1fr 1.25fr;
+    gap: 4rem;
+  }
+  .skills-matrix-column {
+    grid-template-columns: 1fr;
+  }
+}
+

@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { AuthContext } from '../context/AuthContext';
 import { Plus, Edit3, Trash2, X } from 'lucide-react';
+import { API_URL } from '../config';
+
 import ProjectForm from '../components/Admin/ProjectForm';
 import MessageList from '../components/Admin/MessageList';
 
@@ -22,7 +24,9 @@ export default function AdminDashboard() {
 
   const fetchProjects = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/projects');
+      const res = await fetch(`${API_URL}/api/projects`, {
+        credentials: 'include'
+      });
       if (res.ok) {
         const data = await res.json();
         setProjects(data);
@@ -34,7 +38,9 @@ export default function AdminDashboard() {
 
   const fetchSkills = async () => {
     try {
-      const res = await fetch('http://localhost:5000/api/skills');
+      const res = await fetch(`${API_URL}/api/skills`, {
+        credentials: 'include'
+      });
       if (res.ok) {
         const data = await res.json();
         setSkills(data);
@@ -61,11 +67,9 @@ export default function AdminDashboard() {
     if (!window.confirm('Delete this project?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/projects/${id}`, {
+      const res = await fetch(`${API_URL}/api/projects/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include'
       });
 
       if (res.ok) {
@@ -81,12 +85,12 @@ export default function AdminDashboard() {
     setSkillsError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/skills', {
+      const res = await fetch(`${API_URL}/api/skills`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify({
           name: newSkillName,
           category: newSkillCategory,
@@ -111,11 +115,9 @@ export default function AdminDashboard() {
     if (!window.confirm('Delete this skill?')) return;
 
     try {
-      const res = await fetch(`http://localhost:5000/api/skills/${id}`, {
+      const res = await fetch(`${API_URL}/api/skills/${id}`, {
         method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        credentials: 'include'
       });
 
       if (res.ok) {

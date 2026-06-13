@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { API_URL } from '../../config';
+
 
 export default function ProjectForm({ project, token, onSuccess, onCancel }) {
   const [title, setTitle] = useState('');
@@ -49,8 +51,8 @@ export default function ProjectForm({ project, token, onSuccess, onCancel }) {
     };
 
     const url = project
-      ? `http://localhost:5000/api/projects/${project._id}`
-      : 'http://localhost:5000/api/projects';
+      ? `${API_URL}/api/projects/${project._id}`
+      : `${API_URL}/api/projects`;
 
     const method = project ? 'PUT' : 'POST';
 
@@ -58,9 +60,9 @@ export default function ProjectForm({ project, token, onSuccess, onCancel }) {
       const res = await fetch(url, {
         method,
         headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
+        credentials: 'include',
         body: JSON.stringify(projectData),
       });
 

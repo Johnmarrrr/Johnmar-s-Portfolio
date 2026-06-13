@@ -1,10 +1,24 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
 import { ArrowRight, Send, Mail, MapPin, Phone, Code2, Database, Wrench } from 'lucide-react';
 import ProjectCard from '../components/ProjectCard';
+import IconCloud from '../components/IconCloud';
+import { API_URL } from '../config';
+
+
 
 // Fallback Mock Data
 const MOCK_PROJECTS = [
+  {
+    _id: 'kabisado',
+    title: 'Kabisado Educational Game',
+    description: 'An interactive HTML5 educational platformer designed to make learning engaging and digital workflows accessible to students and developers.',
+    category: 'Fullstack',
+    imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&q=80&w=800',
+    tags: ['GDevelop', 'Pixi.js', 'HTML5', 'JavaScript'],
+    githubUrl: 'https://github.com',
+    liveUrl: 'https://kabisado.top/',
+  },
   {
     _id: 'mock1',
     title: 'Cognitive Web Engine',
@@ -93,6 +107,131 @@ const EDUCATION = [
   }
 ];
 
+const Terminal = () => {
+  const [history, setHistory] = useState([
+    'Welcome to Johnmar\'s interactive shell.',
+    'Type "help" for a list of available commands.',
+    ''
+  ]);
+  const [input, setInput] = useState('');
+  const terminalEndRef = useRef(null);
+
+  const handleCommandSubmit = (e) => {
+    e.preventDefault();
+    const cmd = input.trim().toLowerCase();
+    let newHistory = [...history, `johnmar@portfolio:~$ ${input}`];
+
+    if (cmd === 'help') {
+      newHistory.push(
+        'Available commands:',
+        '  about     - Learn more about who I am',
+        '  skills    - List my technical stack and expertise',
+        '  projects  - See a list of featured creations',
+        '  contact   - Get my email and location details',
+        '  clear     - Clear the terminal screen'
+      );
+    } else if (cmd === 'about') {
+      newHistory.push(
+        'I\'m Johnmar Cordeño, a full-stack developer specializing in JavaScript/Node.js.',
+        'Creator of the Kabisado Educational Game. I love building high-performance APIs',
+        'and elegant interfaces.'
+      );
+    } else if (cmd === 'skills') {
+      newHistory.push(
+        'Core Skills:',
+        '  Frontend: React, Vue.js, HTML5, CSS3, JavaScript',
+        '  Backend:  Node.js, Express, PHP, Python, C#',
+        '  Databases: MongoDB, MySQL, Firebase, Redis',
+        '  Tools:    Git, Docker, VS Code, Vite'
+      );
+    } else if (cmd === 'projects') {
+      newHistory.push(
+        'Featured Projects:',
+        '  1. Kabisado Educational Game - interactive web game',
+        '  2. Cognitive Web Engine - high-performance WebGL renderer',
+        '  3. Distributed Analytics API - Express & Node query telemetry orchestrator'
+      );
+    } else if (cmd === 'contact') {
+      newHistory.push(
+        'Contact Info:',
+        '  Email:    johnmarcordeno@gmail.com',
+        '  Location: Lipa City, Batangas, Philippines',
+        '  Status:   Available for Freelance & Full-time opportunities'
+      );
+    } else if (cmd === 'clear') {
+      newHistory = [];
+    } else if (cmd !== '') {
+      newHistory.push(`shell: command not found: ${cmd}. Type "help" for support.`);
+    }
+
+    if (cmd !== 'clear') {
+      newHistory.push(''); // Add a blank line for formatting
+    }
+
+    setHistory(newHistory);
+    setInput('');
+  };
+
+  useEffect(() => {
+    terminalEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  }, [history]);
+
+  return (
+    <div className="code-window" onClick={() => document.getElementById('terminal-input')?.focus()} style={{ cursor: 'text' }}>
+      <div className="code-header">
+        <div className="code-dots">
+          <span className="code-dot red"></span>
+          <span className="code-dot yellow"></span>
+          <span className="code-dot green"></span>
+        </div>
+        <span className="code-tab">johnmar_shell.sh</span>
+      </div>
+      <div className="code-content terminal-body" style={{ height: '300px', overflowY: 'auto', display: 'flex', flexDirection: 'column', padding: '1rem', fontFamily: 'var(--font-mono)' }}>
+        <div style={{ flexGrow: 1 }}>
+          {history.map((line, idx) => (
+            <div key={idx} style={{ minHeight: '1.2rem' }}>
+              {line.startsWith('johnmar@portfolio:~$') ? (
+                <span>
+                  <span className="code-keyword" style={{ color: '#10b981' }}>johnmar@portfolio</span>
+                  <span style={{ color: '#f8fafc' }}>:</span>
+                  <span className="code-variable" style={{ color: '#6366f1' }}>~$</span>{' '}
+                  <span style={{ color: '#f8fafc' }}>{line.replace('johnmar@portfolio:~$', '')}</span>
+                </span>
+              ) : (
+                <span style={{ color: '#e2e8f0' }}>{line}</span>
+              )}
+            </div>
+          ))}
+          <div ref={terminalEndRef} />
+        </div>
+        
+        <form onSubmit={handleCommandSubmit} style={{ display: 'flex', marginTop: '0.5rem', alignItems: 'center' }}>
+          <span className="code-keyword" style={{ color: '#10b981', marginRight: '4px' }}>johnmar@portfolio</span>
+          <span style={{ color: '#f8fafc', marginRight: '4px' }}>:</span>
+          <span className="code-variable" style={{ color: '#6366f1', marginRight: '8px' }}>~$</span>
+          <input
+            id="terminal-input"
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            style={{
+              background: 'none',
+              border: 'none',
+              color: '#f8fafc',
+              outline: 'none',
+              fontFamily: 'inherit',
+              fontSize: 'inherit',
+              flexGrow: 1,
+              padding: 0
+            }}
+            autoComplete="off"
+          />
+        </form>
+      </div>
+    </div>
+  );
+};
+
 export default function Home() {
   const [projects, setProjects] = useState([]);
   const [skills, setSkills] = useState([]);
@@ -146,7 +285,7 @@ export default function Home() {
     // Fetch Projects
     const fetchProjects = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/projects');
+        const res = await fetch(`${API_URL}/api/projects`);
         if (res.ok) {
           const data = await res.json();
           setProjects(data.length > 0 ? data : MOCK_PROJECTS);
@@ -161,7 +300,7 @@ export default function Home() {
     // Fetch Skills
     const fetchSkills = async () => {
       try {
-        const res = await fetch('http://localhost:5000/api/skills');
+        const res = await fetch(`${API_URL}/api/skills`);
         if (res.ok) {
           const data = await res.json();
           setSkills(data.length > 0 ? data : MOCK_SKILLS);
@@ -195,7 +334,7 @@ export default function Home() {
     setStatusMsg({ type: '', text: '' });
 
     try {
-      const res = await fetch('http://localhost:5000/api/messages', {
+      const res = await fetch(`${API_URL}/api/messages`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -267,45 +406,7 @@ export default function Home() {
                 }} />
               </div>
 
-              <div className="code-window">
-                <div className="code-header">
-                  <div className="code-dots">
-                    <span className="code-dot red"></span>
-                    <span className="code-dot yellow"></span>
-                    <span className="code-dot green"></span>
-                  </div>
-                  <span className="code-tab">profile.js</span>
-                </div>
-                <div className="code-content">
-                  <div><span className="code-keyword">const</span> <span className="code-variable">profile</span> = &#123;</div>
-                  <div>  name: <span className="code-string">'Johnmar Cordeño'</span>,</div>
-                  <div>  title: <span className="code-string">'Full-Stack Developer | Problem Solver'</span>,</div>
-                  <div>  skills: [</div>
-                  <div>    <span className="code-string">'React'</span>, <span className="code-string">'NextJS'</span>, <span className="code-string">'Java'</span>, <span className="code-string">'Express'</span>,</div>
-                  <div>    <span className="code-string">'MySQL'</span>, <span className="code-string">'MongoDB'</span>, <span className="code-string">'Docker'</span>, <span className="code-string">'AWS'</span>,</div>
-                  <div>    <span className="code-string">'TypeScript'</span>, <span className="code-string">'Git'</span>, <span className="code-string">'C#'</span>, <span className="code-string">'Gdevelop'</span></div>
-                  <div>  ],</div>
-                  <div>  hardWorker: <span className="code-boolean">true</span>,</div>
-                  <div>  quickLearner: <span className="code-boolean">true</span>,</div>
-                  <div>  problemSolver: <span className="code-boolean">true</span>,</div>
-                  <div>  yearsOfExperience: <span className="code-number">4</span>,</div>
-                  <div>  <span className="code-method">hireable</span>: <span className="code-keyword">function</span>() &#123;</div>
-                  <div>    <span className="code-keyword">return</span> (</div>
-                  <div>      <span className="code-variable">this</span>.hardWorker &&</div>
-                  <div>      <span className="code-variable">this</span>.problemSolver &&</div>
-                  <div>      <span className="code-variable">this</span>.skills.length &gt;= <span className="code-number">5</span> &&</div>
-                  <div>      <span className="code-variable">this</span>.yearsOfExperience &gt;= <span className="code-number">3</span></div>
-                  <div>    );</div>
-                  <div>  &#125;</div>
-                  <div>&#125;;</div>
-                  <div className="code-result">
-                    <span className="code-result-label">// Interactive Check</span>
-                    <span className="code-result-val">
-                      profile.hireable() =&gt; true 
-                    </span>
-                  </div>
-                </div>
-              </div>
+              <Terminal />
             </div>
           </div>
         </div>
@@ -347,59 +448,69 @@ export default function Home() {
             <p className="section-subtitle">Proficiencies and core libraries supporting my full-stack workflow.</p>
           </div>
 
-          <div className="skills-container">
-            {/* Frontend */}
-            <div className="skills-category-card glow-card">
-              <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Code2 size={20} className="gradient-text" /> Frontend
-              </h3>
-              {skills.filter(s => s.category === 'Frontend').map(skill => (
-                <div key={skill._id} className="skill-item">
-                  <div className="skill-info">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-percentage">{skill.level}%</span>
-                  </div>
-                  <div className="skill-bar-bg">
-                    <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
-                  </div>
-                </div>
-              ))}
+          <div className="skills-grid-layout">
+            {/* Left Column: 3D Interactive Icon Cloud */}
+            <div className="skills-globe-column">
+              <div className="skills-globe-wrapper glow-card">
+                <IconCloud />
+              </div>
             </div>
 
-            {/* Backend */}
-            <div className="skills-category-card glow-card">
-              <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Database size={20} className="gradient-text" /> Backend
-              </h3>
-              {skills.filter(s => s.category === 'Backend').map(skill => (
-                <div key={skill._id} className="skill-item">
-                  <div className="skill-info">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-percentage">{skill.level}%</span>
+            {/* Right Column: Skills Progress Matrix */}
+            <div className="skills-matrix-column">
+              {/* Frontend */}
+              <div className="skills-category-card glow-card">
+                <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Code2 size={20} className="gradient-text" /> Frontend
+                </h3>
+                {skills.filter(s => s.category === 'Frontend').map(skill => (
+                  <div key={skill._id} className="skill-item">
+                    <div className="skill-info">
+                      <span className="skill-name">{skill.name}</span>
+                      <span className="skill-percentage">{skill.level}%</span>
+                    </div>
+                    <div className="skill-bar-bg">
+                      <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
+                    </div>
                   </div>
-                  <div className="skill-bar-bg">
-                    <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
 
-            {/* Tools & Workflow */}
-            <div className="skills-category-card glow-card">
-              <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                <Wrench size={20} className="gradient-text" /> Tools & Workflow
-              </h3>
-              {skills.filter(s => s.category !== 'Frontend' && s.category !== 'Backend').map(skill => (
-                <div key={skill._id} className="skill-item">
-                  <div className="skill-info">
-                    <span className="skill-name">{skill.name}</span>
-                    <span className="skill-percentage">{skill.level}%</span>
+              {/* Backend */}
+              <div className="skills-category-card glow-card">
+                <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Database size={20} className="gradient-text" /> Backend
+                </h3>
+                {skills.filter(s => s.category === 'Backend').map(skill => (
+                  <div key={skill._id} className="skill-item">
+                    <div className="skill-info">
+                      <span className="skill-name">{skill.name}</span>
+                      <span className="skill-percentage">{skill.level}%</span>
+                    </div>
+                    <div className="skill-bar-bg">
+                      <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
+                    </div>
                   </div>
-                  <div className="skill-bar-bg">
-                    <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
+                ))}
+              </div>
+
+              {/* Tools & Workflow */}
+              <div className="skills-category-card glow-card">
+                <h3 className="skills-category-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <Wrench size={20} className="gradient-text" /> Tools & Workflow
+                </h3>
+                {skills.filter(s => s.category !== 'Frontend' && s.category !== 'Backend').map(skill => (
+                  <div key={skill._id} className="skill-item">
+                    <div className="skill-info">
+                      <span className="skill-name">{skill.name}</span>
+                      <span className="skill-percentage">{skill.level}%</span>
+                    </div>
+                    <div className="skill-bar-bg">
+                      <div className="skill-bar-fill" style={{ width: `${skill.level}%` }}></div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
           </div>
         </div>
