@@ -12,6 +12,7 @@ if (!newPassword) {
   process.exit(1);
 }
 
+
 mongoose.connect(process.env.MONGO_URI)
   .then(async () => {
     // Locate the admin user
